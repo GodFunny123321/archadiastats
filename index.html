@@ -335,7 +335,7 @@ function calculate() {
   scoreRing.style.setProperty("--ring-color", color);
   scoreValue.textContent = Math.round(avg);
   verdict.textContent = label;
-  verdictSub.textContent = `${sub} Valutazione su ${results.length} statistich${results.length===1?"a":"e"}.`;
+  verdictSub.textContent = `${sub} Valutazione su ${results.length} stats.`;
 
   breakdown.innerHTML = results.map(r => `
     <div class="metric">
