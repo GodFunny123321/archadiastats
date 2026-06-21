@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Reforge by firegr</title>
+  <style>
+    :root{
+      --bg:#090b12;
+      --panel:#111522;
+      --panel-2:#171c2c;
+      --line:#283047;
+      --text:#f4f6ff;
+      --muted:#98a2bd;
+      --accent:#8b5cf6;
+      --accent-2:#22d3ee;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --radius:20px;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 15% -10%,rgba(139,92,246,.23),transparent 34%),
+        radial-gradient(circle at 100% 5%,rgba(34,211,238,.14),transparent 30%),
+        var(--bg);
+    }
+
+    button,input,select{font:inherit}
+    button{color:inherit}
+    .shell{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:42px 0 70px}
+    .hero{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:26px}
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(139,92,246,.35);
+      border-radius:999px;background:rgba(139,92,246,.09);color:#c4b5fd;font-size:.76rem;font-weight:800;
+      letter-spacing:.12em;text-transform:uppercase
+    }
+    h1{font-size:clamp(2.15rem,6vw,4.3rem);line-height:.95;letter-spacing:-.055em;margin:14px 0 12px}
+    .gradient{background:linear-gradient(110deg,#fff 15%,#c4b5fd 55%,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{max-width:690px;margin:0;color:var(--muted);font-size:1.02rem;line-height:1.65}
+    .count{
+      flex:0 0 auto;padding:12px 15px;border:1px solid var(--line);border-radius:14px;background:rgba(17,21,34,.76);
+      color:var(--muted);font-size:.9rem
+    }
+    .count strong{color:var(--text);font-size:1.15rem}
+
+    .layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(310px,.7fr);gap:22px;align-items:start}
+    .card{
+      background:linear-gradient(145deg,rgba(23,28,44,.96),rgba(14,18,30,.96));
+      border:1px solid rgba(80,91,125,.38);border-radius:var(--radius);box-shadow:var(--shadow)
+    }
+    .main-card{padding:22px}
+    .side-card{padding:22px;position:sticky;top:18px}
+    .label{display:block;color:#c8cfe1;font-size:.8rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px}
+    .search-wrap{position:relative}
+    .search-wrap svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:19px;color:var(--muted);pointer-events:none}
+    #itemSearch{
+      width:100%;height:52px;padding:0 46px;border-radius:14px;border:1px solid var(--line);
+      background:#0d111c;color:var(--text);outline:none;transition:.2s
+    }
+    #itemSearch:focus,.stat-input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(139,92,246,.12)}
+    .dropdown{
+      display:none;position:absolute;z-index:20;left:0;right:0;top:59px;max-height:310px;overflow:auto;
+      background:#111624;border:1px solid var(--line);border-radius:14px;padding:7px;box-shadow:0 22px 50px rgba(0,0,0,.45)
+    }
+    .dropdown.open{display:block}
+    .option{
+      width:100%;border:0;background:transparent;text-align:left;padding:11px 12px;border-radius:10px;cursor:pointer;color:#dce2f2
+    }
+    .option:hover,.option.active{background:rgba(139,92,246,.15);color:#fff}
+    .empty-option{padding:14px;color:var(--muted);text-align:center}
+
+    .selected-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:25px 0 13px}
+    .selected-head h2{font-size:1.25rem;margin:0;overflow-wrap:anywhere}
+    .reset{
+      border:1px solid var(--line);background:#111624;border-radius:11px;padding:8px 11px;color:var(--muted);cursor:pointer
+    }
+    .reset:hover{color:#fff;border-color:#56617f}
+    .hint{
+      background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.18);color:#a5eaf4;
+      border-radius:12px;padding:11px 13px;font-size:.84rem;line-height:1.45;margin-bottom:16px
+    }
+    .stats{display:grid;gap:12px}
+    .stat-row{
+      display:grid;grid-template-columns:minmax(130px,1fr) 150px 48px;gap:12px;align-items:center;
+      padding:14px;border:1px solid var(--line);border-radius:15px;background:rgba(8,11,19,.38)
+    }
+    .stat-name{font-weight:760}
+    .range{display:block;color:var(--muted);font-size:.78rem;margin-top:4px}
+    .input-wrap{position:relative}
+    .stat-input{
+      width:100%;height:44px;border-radius:11px;border:1px solid var(--line);background:#0b0f19;color:#fff;
+      padding:0 12px;outline:none
+    }
+    .direction{
+      height:44px;border:1px solid var(--line);border-radius:11px;background:#111624;cursor:pointer;font-size:1.12rem;
+      display:grid;place-items:center
+    }
+    .direction:hover{border-color:var(--accent);background:rgba(139,92,246,.12)}
+    .fixed-badge{
+      grid-column:2 / 4;height:44px;border:1px solid rgba(34,211,238,.23);border-radius:11px;
+      display:flex;align-items:center;justify-content:center;background:rgba(34,211,238,.07);color:#a5f3fc;font-weight:800
+    }
+    .missing{
+      grid-column:2 / 4;color:var(--muted);font-size:.84rem
+    }
+
+    .score-ring{
+      --p:0;
+      width:190px;aspect-ratio:1;border-radius:50%;margin:8px auto 20px;
+      display:grid;place-items:center;
+      background:conic-gradient(var(--ring-color,var(--accent)) calc(var(--p)*1%),#252b3d 0);
+      position:relative
+    }
+    .score-ring::before{content:"";position:absolute;inset:13px;border-radius:50%;background:#111522;box-shadow:inset 0 0 25px rgba(0,0,0,.28)}
+    .score-content{position:relative;text-align:center}
+    .score-value{font-size:3rem;font-weight:900;letter-spacing:-.05em}
+    .score-caption{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800}
+    .verdict{text-align:center;font-size:1.15rem;font-weight:850;margin-bottom:7px}
+    .verdict-sub{text-align:center;color:var(--muted);font-size:.87rem;line-height:1.45;min-height:38px}
+    .divider{height:1px;background:var(--line);margin:21px 0}
+    .breakdown{display:grid;gap:12px}
+    .metric{display:grid;grid-template-columns:1fr auto;gap:7px;font-size:.86rem}
+    .metric-name{color:#dce2f2}
+    .metric-score{font-weight:800}
+    .bar{grid-column:1 / -1;height:6px;background:#252b3d;border-radius:99px;overflow:hidden}
+    .bar > span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:99px;transition:width .35s ease}
+    .placeholder{padding:35px 10px;text-align:center;color:var(--muted)}
+    .placeholder-icon{font-size:2rem;margin-bottom:10px}
+    .footer-note{color:#6f7894;text-align:center;font-size:.78rem;margin-top:20px;line-height:1.5}
+
+    @media(max-width:820px){
+      .hero{align-items:flex-start;flex-direction:column}.layout{grid-template-columns:1fr}.side-card{position:static}
+    }
+    @media(max-width:560px){
+      .shell{width:min(100% - 20px,1120px);padding-top:24px}
+      .main-card,.side-card{padding:16px;border-radius:17px}
+      .stat-row{grid-template-columns:1fr 48px}
+      .stat-row > div:first-child{grid-column:1 / -1}
+      .input-wrap{grid-column:1}
+      .fixed-badge,.missing{grid-column:1 / -1}
+      .score-ring{width:165px}
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <span class="eyebrow">✦ Item quality calculator</span>
+        <h1><span class="gradient">Reforge by firegr</span></h1>
+        <p>Scegli un item, inserisci le statistiche ottenute dal reforge e scopri immediatamente quanto il roll è vicino al valore migliore possibile.</p>
+      </div>
+      <div class="count"><strong id="itemCount">0</strong> item caricati</div>
+    </header>
+
+    <section class="layout">
+      <div class="card main-card">
+        <label class="label" for="itemSearch">Cerca e seleziona un item</label>
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="itemSearch" type="text" autocomplete="off" placeholder="Scrivi il nome dell'item...">
+          <div id="dropdown" class="dropdown"></div>
+        </div>
+
+        <div id="editor">
+          <div class="placeholder">
+            <div class="placeholder-icon">⌁</div>
+            Seleziona un item per visualizzare le sue statistiche.
+          </div>
+        </div>
+      </div>
+
+      <aside class="card side-card">
+        <div class="score-ring" id="scoreRing">
+          <div class="score-content">
+            <div class="score-value"><span id="scoreValue">—</span><small id="percentSign" style="font-size:.45em">%</small></div>
+            <div class="score-caption">qualità roll</div>
+          </div>
+        </div>
+        <div id="verdict" class="verdict">Nessun item selezionato</div>
+        <div id="verdictSub" class="verdict-sub">Inserisci i valori del reforge per ottenere la valutazione.</div>
+        <div class="divider"></div>
+        <div id="breakdown" class="breakdown">
+          <div class="placeholder" style="padding:8px">Qui compariranno le percentuali delle singole statistiche.</div>
+        </div>
+      </aside>
+    </section>
+    <div class="footer-note">I valori fuori intervallo vengono limitati tra 0% e 100%. Usa il pulsante ↑/↓ per scegliere se una statistica è migliore quando cresce o quando diminuisce.</div>
+  </main>
+
+<script>
+const ITEMS = {"Lancia comune":{"Damage":{"kind":"fixed","value":20.0,"unit":""}},"Spada infusa":{"Damage":{"kind":"fixed","value":20.0,"unit":""}},"Spada infusa +1":{"Damage":{"kind":"fixed","value":40.0,"unit":""}},"Scettro infuso":{"Max mana":{"kind":"fixed","value":5.0,"unit":""}},"Scintilla infusa":{"Max mana":{"kind":"fixed","value":10.0,"unit":""}},"Scintilla infusa +1":{"Max mana":{"kind":"fixed","value":10.0,"unit":""}},"Amuleto spento":{"Health":{"kind":"range","min":8.0,"max":12.0,"unit":""},"Damage":{"kind":"range","min":0.2,"max":0.6,"unit":""},"Max mana":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Defense":{"kind":"fixed","value":1.0,"unit":""}},"Amuleto ombra":{"Health":{"kind":"range","min":10.0,"max":16.0,"unit":""},"Damage":{"kind":"range","min":0.6,"max":0.9,"unit":""},"Speed":{"kind":"range","min":0.01,"max":0.05,"unit":""},"Max mana":{"kind":"range","min":1.0,"max":4.0,"unit":""},"Defense":{"kind":"fixed","value":1.0,"unit":""}},"Gemma caleidoscopica":{"Health":{"kind":"range","min":9.0,"max":12.0,"unit":""},"Speed":{"kind":"range","min":0.01,"max":0.05,"unit":""},"Max mana":{"kind":"fixed","value":10.0,"unit":""},"Mana regen":{"kind":"fixed","value":0.5,"unit":""}},"Gemma di mana":{"Health":{"kind":"range","min":12.0,"max":18.0,"unit":""},"Speed":{"kind":"range","min":0.04,"max":0.06,"unit":""},"Max mana":{"kind":"fixed","value":10.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.0,"unit":""},"Defense":{"kind":"fixed","value":1.0,"unit":""}},"Spada in Ottone":{"Damage":{"kind":"range","min":20.0,"max":25.0,"unit":""}},"Katana in ferro":{"Damage":{"kind":"range","min":12.0,"max":15.0,"unit":""}},"Katana ombra":{"Health":{"kind":"fixed","value":35.0,"unit":""},"Damage":{"kind":"range","min":43.0,"max":50.0,"unit":""}},"Coltellino in ferro":{"Damage":{"kind":"range","min":2.0,"max":4.5,"unit":""}},"Farron Greatsword":{"Damage":{"kind":"range","min":70.0,"max":73.0,"unit":""},"Speed":{"kind":"range","min":0.04,"max":0.06,"unit":""},"Health":{"kind":"range","min":30.0,"max":70.0,"unit":""}},"Farron Knife":{"Damage":{"kind":"fixed","value":20.0,"unit":""},"Health":{"kind":"fixed","value":60.0,"unit":""},"Defense":{"kind":"fixed","value":15.0,"unit":""}},"Scettro del Lich":{"Health":{"kind":"range","min":20.0,"max":40.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":15.0,"unit":""}},"Ali di corvo":{"Peso":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":2.0,"max":5.0,"unit":""}},"Corazza da bandito":{"Defense":{"kind":"range","min":3.0,"max":5.0,"unit":""}},"Pantaloni da bandito":{"Defense":{"kind":"range","min":2.0,"max":5.0,"unit":""}},"Stivali da bandito":{"Defense":{"kind":"range","min":3.0,"max":5.0,"unit":""}},"Canto rapace":{"Damage":{"kind":"range","min":30.0,"max":50.0,"unit":""},"Health":{"kind":"range","min":10.0,"max":15.0,"unit":""}},"Flight of ruin":{"Damage":{"kind":"range","min":56.0,"max":60.0,"unit":""},"Health":{"kind":"range","min":20.0,"max":40.0,"unit":""}},"Testa di porco":{"Health":{"kind":"range","min":10.0,"max":20.0,"unit":""},"Defense":{"kind":"fixed","value":5.0,"unit":""}},"Dragonbone":{"Health":{"kind":"range","min":5.0,"max":10.0,"unit":""}},"Blade Of The Groove":{"Health":{"kind":"range","min":20.0,"max":35.0,"unit":""},"Damage":{"kind":"range","min":50.0,"max":60.0,"unit":""},"Speed":{"kind":"range","min":-0.2,"max":-0.15,"unit":""}},"Tectonic Maul":{"Health":{"kind":"range","min":20.0,"max":35.0,"unit":""},"Damage":{"kind":"range","min":20.0,"max":35.0,"unit":""}},"Tectonic Maul +1":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Damage":{"kind":"range","min":55.0,"max":65.0,"unit":""}},"Corvinator":{"Health":{"kind":"range","min":10.0,"max":15.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.2,"max":-0.15,"unit":""},"Speed":{"kind":"range","min":-0.35,"max":-0.2,"unit":""},"Peso":{"kind":"fixed","value":1.0,"unit":""}},"Incudine di cristallo":{"Health":{"kind":"range","min":30.0,"max":60.0,"unit":""},"Damage":{"kind":"range","min":60.0,"max":70.0,"unit":""}},"Nightmares Bite":{"Health":{"kind":"range","min":5.0,"max":15.0,"unit":""},"Damage":{"kind":"range","min":12.0,"max":15.0,"unit":""}},"Crystal":{"Health":{"kind":"range","min":40.0,"max":70.0,"unit":""},"Peso":{"kind":"range","min":2.0,"max":4.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.2,"max":0.4,"unit":""},"Damage":{"kind":"range","min":-3.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":10.0,"max":14.0,"unit":""}},"Elmo di scaglie":{"Health":{"kind":"range","min":30.0,"max":60.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.2,"unit":""},"Damage":{"kind":"range","min":-1.0,"max":0.0,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""}},"Corazza di scaglie":{"Health":{"kind":"range","min":30.0,"max":60.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.2,"unit":""},"Damage":{"kind":"range","min":-1.0,"max":0.0,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""}},"Gambali di scaglie":{"Health":{"kind":"range","min":30.0,"max":60.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.2,"unit":""},"Damage":{"kind":"range","min":-1.0,"max":0.0,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""}},"Stivali di scaglie":{"Health":{"kind":"range","min":30.0,"max":60.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.2,"unit":""},"Damage":{"kind":"range","min":-1.0,"max":0.0,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""}},"Pensiero celestiale":{"Health":{"kind":"range","min":20.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":6.0,"max":7.0,"unit":""},"Max mana":{"kind":"range","min":3.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":2.0,"unit":""}},"Tunica celestiale":{"Health":{"kind":"range","min":20.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":6.0,"max":7.0,"unit":""},"Max mana":{"kind":"range","min":3.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":2.0,"unit":""}},"Pantaloni celestiali":{"Health":{"kind":"range","min":20.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":6.0,"max":7.0,"unit":""},"Max mana":{"kind":"range","min":3.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":2.0,"unit":""}},"Stivali celestiali":{"Health":{"kind":"range","min":20.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":6.0,"max":7.0,"unit":""},"Max mana":{"kind":"range","min":3.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":2.0,"unit":""}},"Elmo frangispade":{"Health":{"kind":"range","min":20.0,"max":35.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":1.0,"unit":""}},"Corazza frangispade":{"Health":{"kind":"range","min":20.0,"max":35.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":1.0,"unit":""}},"Gambiera frangispade":{"Health":{"kind":"range","min":20.0,"max":35.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":1.0,"unit":""}},"Stivali frangispade":{"Health":{"kind":"range","min":20.0,"max":35.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":1.0,"unit":""}},"Cappuccio spettrale":{"Health":{"kind":"range","min":10.0,"max":18.0,"unit":""},"Iframe":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":3.0,"max":5.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":2.0,"unit":""}},"Mantello spettrale":{"Health":{"kind":"range","min":10.0,"max":18.0,"unit":""},"Iframe":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":3.0,"max":5.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":2.0,"unit":""}},"Pantaloni spettrali":{"Health":{"kind":"range","min":10.0,"max":18.0,"unit":""},"Iframe":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":3.0,"max":5.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":2.0,"unit":""}},"Pantofole spettrali":{"Health":{"kind":"range","min":10.0,"max":18.0,"unit":""},"Iframe":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":3.0,"max":5.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":2.0,"unit":""}},"Possessed helmet":{"Health":{"kind":"range","min":20.0,"max":30.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.5,"unit":""},"Peso":{"kind":"range","min":0.0,"max":1.5,"unit":""},"Damage":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":5.0,"max":6.5,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":2.0,"unit":""}},"Possessed chestplate":{"Health":{"kind":"range","min":20.0,"max":30.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.5,"unit":""},"Peso":{"kind":"range","min":0.0,"max":1.5,"unit":""},"Damage":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":5.0,"max":6.5,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":2.0,"unit":""}},"Possessed leggings":{"Health":{"kind":"range","min":20.0,"max":30.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.5,"unit":""},"Peso":{"kind":"range","min":0.0,"max":1.5,"unit":""},"Damage":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":5.0,"max":6.5,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":2.0,"unit":""}},"Possessed boots":{"Health":{"kind":"range","min":20.0,"max":30.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.5,"unit":""},"Peso":{"kind":"range","min":0.0,"max":1.5,"unit":""},"Damage":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":5.0,"max":6.5,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":2.0,"unit":""}},"Slime acido":{"Health":{"kind":"range","min":20.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":3.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.4,"unit":""},"Defense":{"kind":"range","min":6.0,"max":10.0,"unit":""}},"Maschera galvanica":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.03,"max":0.08,"unit":""},"Damage":{"kind":"range","min":0.3,"max":0.8,"unit":""},"Defense":{"kind":"range","min":8.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":1.5,"max":2.2,"unit":""},"Max mana":{"kind":"range","min":4.0,"max":9.0,"unit":""}},"Corazza galvanica":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.03,"max":0.08,"unit":""},"Damage":{"kind":"range","min":0.3,"max":0.8,"unit":""},"Defense":{"kind":"range","min":8.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":1.5,"max":2.2,"unit":""},"Max mana":{"kind":"range","min":4.0,"max":9.0,"unit":""}},"Gambaiera galvanica":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.03,"max":0.08,"unit":""},"Damage":{"kind":"range","min":0.3,"max":0.8,"unit":""},"Defense":{"kind":"range","min":8.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":1.5,"max":2.2,"unit":""},"Max mana":{"kind":"range","min":4.0,"max":9.0,"unit":""}},"Stivali galvanici":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.03,"max":0.08,"unit":""},"Damage":{"kind":"range","min":0.3,"max":0.8,"unit":""},"Defense":{"kind":"range","min":8.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":1.5,"max":2.2,"unit":""},"Max mana":{"kind":"range","min":4.0,"max":9.0,"unit":""}},"Coracasio":{"Health":{"kind":"range","min":0.0,"max":30.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":3.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Damage":{"kind":"range","min":0.0,"max":3.0,"unit":""},"Speed":{"kind":"range","min":0.08,"max":0.12,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":1.0,"unit":""}},"Fluctus":{"Health":{"kind":"range","min":20.0,"max":50.0,"unit":""},"Iframe":{"kind":"range","min":0.0,"max":3.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Damage":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":8.0,"unit":""}},"Amuleto infetto":{"Health":{"kind":"range","min":20.0,"max":35.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"fixed","value":0.1,"unit":""},"Damage":{"kind":"fixed","value":2.0,"unit":""},"Defense":{"kind":"range","min":4.0,"max":6.0,"unit":""}},"Amuleto del velocista":{"Speed":{"kind":"range","min":0.08,"max":0.12,"unit":""}},"Amuleto del berserk":{"Damage":{"kind":"range","min":1.0,"max":3.0,"unit":""}},"Amuleto del tank":{"Defense":{"kind":"range","min":3.0,"max":7.0,"unit":""}},"Amuleto dello stregone":{"Mana regen":{"kind":"range","min":0.0,"max":1.5,"unit":""},"Max mana":{"kind":"range","min":2.0,"max":5.0,"unit":""}},"Parassita addomesticato":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":3.0,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":1.5,"max":2.5,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":10.0,"unit":""}},"Fibrici":{"Health":{"kind":"range","min":30.0,"max":50.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.05,"max":0.15,"unit":""},"Peso":{"kind":"range","min":2.0,"max":4.0,"unit":""},"Damage":{"kind":"range","min":-4.0,"max":0.0,"unit":""},"Speed":{"kind":"range","min":-0.15,"max":-0.05,"unit":""},"Defense":{"kind":"range","min":10.0,"max":14.0,"unit":""}},"Slime Boots":{"Health":{"kind":"range","min":-20.0,"max":40.0,"unit":""},"Damage":{"kind":"range","min":-20.0,"max":30.0,"unit":""},"Defense":{"kind":"range","min":-30.0,"max":-10.0,"unit":""},"Mana regen":{"kind":"range","min":-10.0,"max":-2.0,"unit":""},"Max mana":{"kind":"range","min":-200.0,"max":-150.0,"unit":""}},"Pistris":{"Health":{"kind":"range","min":-10.0,"max":30.0,"unit":""},"Speed":{"kind":"range","min":0.05,"max":0.15,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":3.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":15.0,"unit":""}},"Aurcosnimaa":{"Speed":{"kind":"range","min":0.02,"max":0.08,"unit":""}},"Allun":{"Health":{"kind":"range","min":10.0,"max":25.0,"unit":""},"Damage":{"kind":"range","min":1.0,"max":3.0,"unit":""},"Peso":{"kind":"range","min":0.5,"max":2.5,"unit":""},"Defense":{"kind":"range","min":6.0,"max":7.0,"unit":""}},"Arbetne":{"Damage":{"kind":"range","min":6.0,"max":8.0,"unit":""},"Speed":{"kind":"range","min":0.01,"max":0.03,"unit":""}},"Guanto della belva":{"Health":{"kind":"range","min":20.0,"max":40.0,"unit":""},"Damage":{"kind":"range","min":1.0,"max":3.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.05,"max":0.15,"unit":""},"Speed":{"kind":"range","min":-0.1,"max":-0.025,"unit":""},"Peso":{"kind":"range","min":0.0,"max":4.0,"unit":""},"Defense":{"kind":"range","min":-2.0,"max":3.0,"unit":""}},"Viridea":{"Health":{"kind":"range","min":-150.0,"max":0.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-1.0,"max":0.0,"unit":""}},"Rupture":{"Damage":{"kind":"range","min":70.0,"max":82.0,"unit":""},"Health":{"kind":"range","min":100.0,"max":150.0,"unit":""},"Mana regen":{"kind":"range","min":1.5,"max":2.2,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":15.0,"unit":""}},"Hemall":{"Health":{"kind":"range","min":70.0,"max":120.0,"unit":""},"Damage":{"kind":"range","min":72.0,"max":78.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.3,"max":0.5,"unit":""},"Speed":{"kind":"range","min":-0.1,"max":0.1,"unit":""}},"Scintilla ossea":{"Health":{"kind":"fixed","value":1.0,"unit":""},"Damage":{"kind":"fixed","value":1.0,"unit":""},"Knockback Resistance":{"kind":"fixed","value":0.05,"unit":""},"Speed":{"kind":"fixed","value":1.0,"unit":"%"}},"Germoglio del peccato":{"Health":{"kind":"range","min":50.0,"max":200.0,"unit":""},"Knockback Resistance":{"kind":"fixed","value":0.05,"unit":""},"Speed":{"kind":"range","min":-0.2,"max":-0.1,"unit":""}},"Chiave di folgore":{"Health":{"kind":"range","min":50.0,"max":70.0,"unit":""},"Speed":{"kind":"range","min":0.05,"max":0.2,"unit":""},"Mana regen":{"kind":"range","min":1.5,"max":2.5,"unit":""},"Max mana":{"kind":"range","min":10.0,"max":20.0,"unit":""}},"Coltello avvelenato":{"Health":{"kind":"range","min":0.0,"max":10.0,"unit":""},"Damage":{"kind":"range","min":0.0,"max":1.5,"unit":""},"Speed":{"kind":"range","min":0.015,"max":0.05,"unit":""},"Mana regen":{"kind":"fixed","value":0.2,"unit":""}},"Moonfall":{"Health":{"kind":"range","min":5.0,"max":15.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.01,"max":0.08,"unit":""},"Speed":{"kind":"range","min":-0.08,"max":-0.035,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":2.0,"max":4.0,"unit":""},"Mana regen":{"kind":"range","min":0.2,"max":0.6,"unit":""},"Max mana":{"kind":"range","min":4.0,"max":6.0,"unit":""}},"Regio":{"Health":{"kind":"range","min":15.0,"max":30.0,"unit":""},"Damage":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Speed":{"kind":"range","min":0.02,"max":0.08,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Defense":{"kind":"fixed","value":1.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.0,"unit":""}},"Spada ossea":{"Damage":{"kind":"range","min":30.0,"max":40.0,"unit":""}},"Eritimicert":{"Damage":{"kind":"range","min":55.0,"max":58.0,"unit":""}},"Voidcore":{"Damage":{"kind":"range","min":67.0,"max":76.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.05,"max":0.2,"unit":""},"Speed":{"kind":"range","min":-0.15,"max":-0.05,"unit":""}},"Pendente furia":{"Health":{"kind":"range","min":30.0,"max":50.0,"unit":""},"Damage":{"kind":"range","min":2.0,"max":5.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.05,"max":0.2,"unit":""},"Speed":{"kind":"range","min":0.03,"max":0.08,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":3.0,"max":5.0,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":2.0,"unit":""}},"Coagulo":{"Health":{"kind":"range","min":-90.0,"max":90.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.3,"max":0.6,"unit":""},"Speed":{"kind":"range","min":-0.1,"max":0.0,"unit":""},"Mana regen":{"kind":"range","min":1.5,"max":2.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":10.0,"unit":""}},"Bloodsucker":{"Health":{"kind":"range","min":0.0,"max":30.0,"unit":""},"Speed":{"kind":"range","min":0.1,"max":0.25,"unit":""}},"Vinide":{"Health":{"kind":"range","min":50.0,"max":80.0,"unit":""},"Damage":{"kind":"range","min":90.0,"max":100.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.25,"unit":""},"Speed":{"kind":"range","min":-0.1,"max":0.0,"unit":""},"Defense":{"kind":"range","min":-10.0,"max":0.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":7.0,"unit":""}},"Lacrime in bottiglia":{"Health":{"kind":"range","min":20.0,"max":40.0,"unit":""},"Damage":{"kind":"range","min":-2.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":4.0,"unit":""},"Defense":{"kind":"range","min":1.0,"max":3.0,"unit":""},"Mana regen":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Max mana":{"kind":"range","min":1.0,"max":5.0,"unit":""}},"Elerie":{"Health":{"kind":"range","min":10.0,"max":30.0,"unit":""},"Damage":{"kind":"range","min":0.0,"max":3.0,"unit":""},"Speed":{"kind":"range","min":0.0,"max":0.05,"unit":""},"Defense":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":10.0,"unit":""}},"Wardex":{"Damage":{"kind":"range","min":30.0,"max":45.0,"unit":""},"Health":{"kind":"range","min":10.0,"max":40.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.0,"max":0.1,"unit":""}},"Doath":{"Damage":{"kind":"range","min":-5.0,"max":4.0,"unit":""},"Speed":{"kind":"range","min":-0.1,"max":0.05,"unit":""},"Defense":{"kind":"fixed","value":2.0,"unit":""}},"Tenebreus":{"Damage":{"kind":"range","min":63.0,"max":69.0,"unit":""},"Speed":{"kind":"range","min":0.05,"max":0.15,"unit":""},"Knockback Resistance":{"kind":"fixed","value":-0.2,"unit":""}},"Eco di koosh":{"Damage":{"kind":"range","min":20.0,"max":22.0,"unit":""},"Speed":{"kind":"range","min":0.05,"max":0.1,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.2,"max":0.0,"unit":""},"Health":{"kind":"range","min":-60.0,"max":40.0,"unit":""}},"Alaria":{"Speed":{"kind":"range","min":0.1,"max":0.2,"unit":""}},"Occhio della guida":{"Health":{"kind":"range","min":30.0,"max":45.0,"unit":""},"Damage":{"kind":"range","min":-2.0,"max":1.5,"unit":""},"Speed":{"kind":"range","min":0.03,"max":0.06,"unit":""},"Defense":{"kind":"range","min":4.0,"max":6.0,"unit":""},"Mana regen":{"kind":"range","min":3.0,"max":4.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":15.0,"unit":""}},"Lama acida":{"Damage":{"kind":"range","min":3.0,"max":7.0,"unit":""}},"Bocida":{"Health":{"kind":"range","min":-45.0,"max":0.0,"unit":""},"Speed":{"kind":"range","min":0.0,"max":0.1,"unit":""}},"Lame gemelle":{"Damage":{"kind":"range","min":13.0,"max":17.0,"unit":""}},"Lancia fantasma":{"Damage":{"kind":"range","min":25.0,"max":28.0,"unit":""}},"Twinwaves":{"Damage":{"kind":"range","min":43.0,"max":49.0,"unit":""}},"Hive Blood":{"Health":{"kind":"range","min":20.0,"max":35.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":3.0,"unit":""},"Speed":{"kind":"range","min":-0.15,"max":-0.05,"unit":""},"Defense":{"kind":"range","min":-1.0,"max":2.0,"unit":""}},"Pungiglione Regale":{"Damage":{"kind":"range","min":40.0,"max":45.0,"unit":""}},"Scafandro arrugginito":{"Health":{"kind":"range","min":-30.0,"max":30.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":5.0,"unit":""},"Speed":{"kind":"range","min":-0.2,"max":0.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":9.0,"unit":""}},"Scafandro rafforzato":{"Health":{"kind":"range","min":10.0,"max":50.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":3.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.25,"unit":""},"Speed":{"kind":"range","min":-0.1,"max":0.05,"unit":""},"Defense":{"kind":"range","min":9.0,"max":11.0,"unit":""},"Mana regen":{"kind":"fixed","value":2.5,"unit":""}},"Elmo di scaglie +1":{"Health":{"kind":"range","min":40.0,"max":55.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.3,"unit":""},"Damage":{"kind":"range","min":-1.0,"max":-0.3,"unit":""},"Defense":{"kind":"range","min":11.0,"max":14.0,"unit":""}},"Corazza di scaglie +1":{"Health":{"kind":"range","min":40.0,"max":55.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.3,"unit":""},"Damage":{"kind":"range","min":-1.0,"max":-0.3,"unit":""},"Defense":{"kind":"range","min":11.0,"max":14.0,"unit":""}},"Gambali di scaglie +1":{"Health":{"kind":"range","min":40.0,"max":55.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.3,"unit":""},"Damage":{"kind":"range","min":-1.0,"max":-0.3,"unit":""},"Defense":{"kind":"range","min":11.0,"max":14.0,"unit":""}},"Stivali di scaglie +1":{"Health":{"kind":"range","min":40.0,"max":55.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.1,"max":0.3,"unit":""},"Damage":{"kind":"range","min":-1.0,"max":-0.3,"unit":""},"Defense":{"kind":"range","min":11.0,"max":14.0,"unit":""}},"Pensiero celestiale +1":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":8.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":10.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.0,"unit":""}},"Tunica celestiale +1":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":8.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":10.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.0,"unit":""}},"Gambali celestiali +1":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":8.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":10.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.0,"unit":""}},"Stivali celestiali +1":{"Health":{"kind":"range","min":30.0,"max":40.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":7.0,"max":8.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":10.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.0,"unit":""}},"Elmo frangispade +1":{"Health":{"kind":"range","min":35.0,"max":45.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.1,"max":0.15,"unit":""},"Damage":{"kind":"range","min":0.3,"max":0.5,"unit":""},"Defense":{"kind":"range","min":9.0,"max":10.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.2,"unit":""}},"Corazza frangispade +1":{"Health":{"kind":"range","min":35.0,"max":45.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.1,"max":0.15,"unit":""},"Damage":{"kind":"range","min":0.3,"max":0.5,"unit":""},"Defense":{"kind":"range","min":9.0,"max":10.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.2,"unit":""}},"Gambiera frangispade +1":{"Health":{"kind":"range","min":35.0,"max":45.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.1,"max":0.15,"unit":""},"Damage":{"kind":"range","min":0.3,"max":0.5,"unit":""},"Defense":{"kind":"range","min":9.0,"max":10.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.2,"unit":""}},"Stivali frangispade +1":{"Health":{"kind":"range","min":35.0,"max":45.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.1,"max":0.15,"unit":""},"Damage":{"kind":"range","min":0.3,"max":0.5,"unit":""},"Defense":{"kind":"range","min":9.0,"max":10.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.2,"unit":""}},"Possessed helmet +1":{"Health":{"kind":"range","min":10.0,"max":30.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Damage":{"kind":"range","min":0.5,"max":1.2,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":3.0,"unit":""}},"Possessed chestplate +1":{"Health":{"kind":"range","min":10.0,"max":30.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Damage":{"kind":"range","min":0.5,"max":1.2,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":3.0,"unit":""}},"Possessed leggings +1":{"Health":{"kind":"range","min":10.0,"max":30.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Damage":{"kind":"range","min":0.5,"max":1.2,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":3.0,"unit":""}},"Possessed boots +1":{"Health":{"kind":"range","min":10.0,"max":30.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Damage":{"kind":"range","min":0.5,"max":1.2,"unit":""},"Defense":{"kind":"range","min":6.0,"max":8.0,"unit":""},"Mana regen":{"kind":"range","min":1.0,"max":3.0,"unit":""}},"Maschera galvanica +1":{"Health":{"kind":"range","min":30.0,"max":50.0,"unit":""},"Iframe":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":3.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.0,"max":0.2,"unit":""},"Damage":{"kind":"range","min":0.5,"max":1.0,"unit":""},"Defense":{"kind":"range","min":11.0,"max":12.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":9.0,"unit":""}},"Corazza galvanica +1":{"Health":{"kind":"range","min":30.0,"max":50.0,"unit":""},"Iframe":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":3.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.0,"max":0.2,"unit":""},"Damage":{"kind":"range","min":0.5,"max":1.0,"unit":""},"Defense":{"kind":"range","min":11.0,"max":12.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":9.0,"unit":""}},"Gambiera galvanica +1":{"Health":{"kind":"range","min":30.0,"max":50.0,"unit":""},"Iframe":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":3.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.0,"max":0.2,"unit":""},"Damage":{"kind":"range","min":0.5,"max":1.0,"unit":""},"Defense":{"kind":"range","min":11.0,"max":12.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":9.0,"unit":""}},"Stivali galvanici +1":{"Health":{"kind":"range","min":30.0,"max":50.0,"unit":""},"Iframe":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Peso":{"kind":"range","min":0.0,"max":3.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.0,"max":0.2,"unit":""},"Damage":{"kind":"range","min":0.5,"max":1.0,"unit":""},"Defense":{"kind":"range","min":11.0,"max":12.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.0,"unit":""},"Max mana":{"kind":"range","min":5.0,"max":9.0,"unit":""}},"Allun +1":{"Health":{"kind":"range","min":30.0,"max":50.0,"unit":""},"Damage":{"kind":"range","min":2.0,"max":4.0,"unit":""},"Peso":{"kind":"range","min":1.0,"max":2.5,"unit":""},"Knockback Resistance":{"kind":"range","min":0.2,"max":0.3,"unit":""},"Defense":{"kind":"range","min":8.0,"max":11.0,"unit":""}},"Pensiero celestiale +2":{"Health":{"kind":"range","min":45.0,"max":55.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":1.0,"unit":""},"Speed":{"kind":"range","min":0.0,"max":0.05,"unit":""},"Defense":{"kind":"range","min":9.0,"max":10.0,"unit":""},"Max mana":{"kind":"range","min":10.0,"max":15.0,"unit":""},"Mana regen":{"kind":"range","min":3.0,"max":5.0,"unit":""}},"Tunica celestiale +2":{"Health":{"kind":"range","min":45.0,"max":55.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":1.0,"unit":""},"Speed":{"kind":"range","min":0.0,"max":0.05,"unit":""},"Defense":{"kind":"range","min":9.0,"max":10.0,"unit":""},"Max mana":{"kind":"range","min":10.0,"max":15.0,"unit":""},"Mana regen":{"kind":"range","min":3.0,"max":5.0,"unit":""}},"Gambali celestiali +2":{"Health":{"kind":"range","min":45.0,"max":55.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":1.0,"unit":""},"Speed":{"kind":"range","min":0.0,"max":0.05,"unit":""},"Defense":{"kind":"range","min":9.0,"max":10.0,"unit":""},"Max mana":{"kind":"range","min":10.0,"max":15.0,"unit":""},"Mana regen":{"kind":"range","min":3.0,"max":5.0,"unit":""}},"Stivali celestiali +2":{"Health":{"kind":"range","min":45.0,"max":55.0,"unit":""},"Peso":{"kind":"range","min":-1.0,"max":1.0,"unit":""},"Speed":{"kind":"range","min":0.0,"max":0.05,"unit":""},"Defense":{"kind":"range","min":9.0,"max":10.0,"unit":""},"Max mana":{"kind":"range","min":10.0,"max":15.0,"unit":""},"Mana regen":{"kind":"range","min":3.0,"max":5.0,"unit":""}},"Elmo frangispade +2":{"Health":{"kind":"range","min":45.0,"max":55.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.0,"max":0.1,"unit":""},"Damage":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":11.0,"max":13.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.7,"unit":""}},"Corazza frangispade +2":{"Health":{"kind":"range","min":45.0,"max":55.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.0,"max":0.1,"unit":""},"Damage":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":11.0,"max":13.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.7,"unit":""}},"Gambiera frangispade +2":{"Health":{"kind":"range","min":45.0,"max":55.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.0,"max":0.1,"unit":""},"Damage":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":11.0,"max":13.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.7,"unit":""}},"Stivali frangispade +2":{"Health":{"kind":"range","min":45.0,"max":55.0,"unit":""},"Knockback Resistance":{"kind":"range","min":0.0,"max":0.1,"unit":""},"Damage":{"kind":"range","min":1.0,"max":2.0,"unit":""},"Defense":{"kind":"range","min":11.0,"max":13.0,"unit":""},"Mana regen":{"kind":"fixed","value":1.7,"unit":""}},"Possessed helmet +2":{"Health":{"kind":"range","min":30.0,"max":45.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.5,"unit":""},"Damage":{"kind":"range","min":1.0,"max":4.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.1,"max":0.05,"unit":""},"Peso":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":8.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.5,"unit":""}},"Possessed chestplate +2":{"Health":{"kind":"range","min":30.0,"max":45.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.5,"unit":""},"Damage":{"kind":"range","min":1.0,"max":4.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.1,"max":0.05,"unit":""},"Peso":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":8.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.5,"unit":""}},"Possessed leggings +2":{"Health":{"kind":"range","min":30.0,"max":45.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.5,"unit":""},"Damage":{"kind":"range","min":1.0,"max":4.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.1,"max":0.05,"unit":""},"Peso":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":8.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.5,"unit":""}},"Possessed boots +2":{"Health":{"kind":"range","min":30.0,"max":45.0,"unit":""},"Iframe":{"kind":"range","min":1.0,"max":2.5,"unit":""},"Damage":{"kind":"range","min":1.0,"max":4.0,"unit":""},"Knockback Resistance":{"kind":"range","min":-0.1,"max":0.05,"unit":""},"Peso":{"kind":"range","min":0.0,"max":1.0,"unit":""},"Defense":{"kind":"range","min":8.0,"max":9.0,"unit":""},"Mana regen":{"kind":"range","min":2.0,"max":3.5,"unit":""}},"Cappuccio delle ombre":{"Health":{"kind":"range","min":40.0,"max":55.0,"unit":""},"Iframe":{"kind":"range","min":1.5,"max":3.5,"unit":""},"Peso":{"kind":"range","min":0.0,"max":2.0,"unit":""},"Damage":{"kind":"range","min":1.0,"max":4.0,"unit":""}}};
+const itemNames = Object.keys(ITEMS).sort((a,b)=>a.localeCompare(b, "it", {sensitivity:"base"}));
+const search = document.getElementById("itemSearch");
+const dropdown = document.getElementById("dropdown");
+const editor = document.getElementById("editor");
+const scoreRing = document.getElementById("scoreRing");
+const scoreValue = document.getElementById("scoreValue");
+const verdict = document.getElementById("verdict");
+const verdictSub = document.getElementById("verdictSub");
+const breakdown = document.getElementById("breakdown");
+document.getElementById("itemCount").textContent = itemNames.length;
+
+let selectedItem = null;
+let directions = {};
+let activeIndex = -1;
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+const fmt = n => Number.isInteger(n) ? String(n) : String(Number(n.toFixed(4)));
+
+function filteredNames() {
+  const q = search.value.trim().toLowerCase();
+  return itemNames.filter(n => n.toLowerCase().includes(q)).slice(0, 80);
+}
+
+function renderDropdown() {
+  const names = filteredNames();
+  activeIndex = Math.min(activeIndex, names.length - 1);
+  dropdown.innerHTML = names.length
+    ? names.map((name,i)=>`<button class="option ${i===activeIndex?"active":""}" data-name="${esc(name)}">${esc(name)}</button>`).join("")
+    : `<div class="empty-option">Nessun item trovato</div>`;
+  dropdown.classList.add("open");
+}
+
+function selectItem(name) {
+  selectedItem = name;
+  search.value = name;
+  dropdown.classList.remove("open");
+  directions = {};
+  const stats = ITEMS[name];
+
+  Object.entries(stats).forEach(([stat, cfg]) => {
+    // Il peso parte come "più basso è meglio"; tutte le altre statistiche come "più alto è meglio".
+    directions[stat] = stat.toLowerCase() === "peso" ? -1 : 1;
+  });
+
+  const rows = Object.entries(stats).map(([stat,cfg]) => {
+    if (cfg.kind === "range") {
+      const unit = cfg.unit || "";
+      return `<div class="stat-row">
+        <div><span class="stat-name">${esc(stat)}</span><span class="range">Range: ${fmt(cfg.min)}${unit} → ${fmt(cfg.max)}${unit}</span></div>
+        <div class="input-wrap"><input class="stat-input" type="number" step="any" data-stat="${esc(stat)}" placeholder="Valore ottenuto"></div>
+        <button class="direction" type="button" data-stat="${esc(stat)}" title="Inverti criterio">${directions[stat]===1?"↑":"↓"}</button>
+      </div>`;
+    }
+    if (cfg.kind === "fixed") {
+      return `<div class="stat-row">
+        <div><span class="stat-name">${esc(stat)}</span><span class="range">Valore fisso</span></div>
+        <div class="fixed-badge">${fmt(cfg.value)}${cfg.unit || ""} · 100%</div>
+      </div>`;
+    }
+    return `<div class="stat-row"><div><span class="stat-name">${esc(stat)}</span></div><div class="missing">Range non specificato nel file</div></div>`;
+  }).join("");
+
+  editor.innerHTML = `
+    <div class="selected-head">
+      <h2>${esc(name)}</h2>
+      <button class="reset" type="button" id="resetBtn">Azzera</button>
+    </div>
+    <div class="hint">↑ significa che il valore massimo è migliore. ↓ significa che il valore minimo è migliore. Per <b>Peso</b> viene usato ↓ automaticamente.</div>
+    <div class="stats">${rows}</div>`;
+
+  editor.querySelectorAll(".stat-input").forEach(el => el.addEventListener("input", calculate));
+  editor.querySelectorAll(".direction").forEach(btn => btn.addEventListener("click", () => {
+    const stat = btn.dataset.stat;
+    directions[stat] *= -1;
+    btn.textContent = directions[stat] === 1 ? "↑" : "↓";
+    calculate();
+  }));
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    editor.querySelectorAll(".stat-input").forEach(el => el.value = "");
+    calculate();
+  });
+  calculate();
+}
+
+function statPercentage(value, cfg, direction) {
+  if (cfg.kind === "fixed") return 100;
+  if (cfg.kind !== "range" || cfg.max === cfg.min) return null;
+  let p = (value - cfg.min) / (cfg.max - cfg.min) * 100;
+  if (direction === -1) p = 100 - p;
+  return Math.max(0, Math.min(100, p));
+}
+
+function evaluation(p) {
+  if (p >= 95) return ["Perfetto", "Roll praticamente massimo.", "#34d399"];
+  if (p >= 85) return ["Eccellente", "Un reforge di qualità molto alta.", "#34d399"];
+  if (p >= 70) return ["Molto buono", "Valori complessivamente sopra la media.", "#22d3ee"];
+  if (p >= 50) return ["Discreto", "Roll nella metà superiore del range.", "#fbbf24"];
+  if (p >= 30) return ["Mediocre", "Può valere la pena tentare un altro reforge.", "#fb923c"];
+  return ["Scarso", "Roll vicino ai valori minimi.", "#fb7185"];
+}
+
+function calculate() {
+  if (!selectedItem) return;
+  const stats = ITEMS[selectedItem];
+  const results = [];
+
+  Object.entries(stats).forEach(([stat,cfg]) => {
+    if (cfg.kind === "fixed") {
+      results.push({stat, p:100, fixed:true});
+      return;
+    }
+    if (cfg.kind !== "range") return;
+    const input = editor.querySelector(`.stat-input[data-stat="${CSS.escape(stat)}"]`);
+    if (!input || input.value === "") return;
+    const value = Number(input.value);
+    if (!Number.isFinite(value)) return;
+    results.push({stat, p:statPercentage(value,cfg,directions[stat]), fixed:false});
+  });
+
+  if (!results.length) {
+    scoreRing.style.setProperty("--p", 0);
+    scoreRing.style.setProperty("--ring-color", "#8b5cf6");
+    scoreValue.textContent = "—";
+    verdict.textContent = "Inserisci le statistiche";
+    verdictSub.textContent = "La qualità totale è la media delle statistiche compilate.";
+    breakdown.innerHTML = `<div class="placeholder" style="padding:8px">Compila almeno un valore variabile.</div>`;
+    return;
+  }
+
+  const avg = results.reduce((s,r)=>s+r.p,0)/results.length;
+  const [label,sub,color] = evaluation(avg);
+  scoreRing.style.setProperty("--p", avg.toFixed(2));
+  scoreRing.style.setProperty("--ring-color", color);
+  scoreValue.textContent = Math.round(avg);
+  verdict.textContent = label;
+  verdictSub.textContent = `${sub} Valutazione su ${results.length} statistich${results.length===1?"a":"e"}.`;
+
+  breakdown.innerHTML = results.map(r => `
+    <div class="metric">
+      <span class="metric-name">${esc(r.stat)}${r.fixed?" · fisso":""}</span>
+      <span class="metric-score">${Math.round(r.p)}%</span>
+      <div class="bar"><span style="width:${r.p}%"></span></div>
+    </div>`).join("");
+}
+
+search.addEventListener("focus", renderDropdown);
+search.addEventListener("input", () => { activeIndex=-1; renderDropdown(); });
+search.addEventListener("keydown", e => {
+  const names = filteredNames();
+  if (e.key === "ArrowDown") { e.preventDefault(); activeIndex = Math.min(activeIndex+1,names.length-1); renderDropdown(); }
+  if (e.key === "ArrowUp") { e.preventDefault(); activeIndex = Math.max(activeIndex-1,0); renderDropdown(); }
+  if (e.key === "Enter" && names.length) { e.preventDefault(); selectItem(names[Math.max(activeIndex,0)]); }
+  if (e.key === "Escape") dropdown.classList.remove("open");
+});
+dropdown.addEventListener("click", e => {
+  const btn = e.target.closest(".option");
+  if (btn) selectItem(btn.dataset.name);
+});
+document.addEventListener("click", e => {
+  if (!e.target.closest(".search-wrap")) dropdown.classList.remove("open");
+});
+</script>
+</body>
+</html>
